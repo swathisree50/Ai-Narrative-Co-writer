@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StorySculpt — AI Storytelling Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="ollam
+  a-notice" id="ollamaNotice" style="display:none; background:#ffcc00; color:#000; padding:8px 16px; text-align:center; font-size:14px;">
+    ⚠️ Ollama server is not reachable. Make sure you have run <code>ollama serve</code> before using the AI features.
+  </div>
+  <div class="app">
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="nav-container">
+        <div class="logo">StorySculpt</div>
+        <div class="nav-controls">
+          <div class="control-group">
+            <label>Genre</label>
+            <select class="nav-select">
+              <option>Romantic</option>
+              <option>Horror</option>
+              <option>Suspense</option>
+              <option>Thriller</option>
+              <option>Fantasy</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Language</label>
+            <select id="language">
+    <option value="English">English</option>
+    <option value="Telugu">Telugu</option>
+    <option value="Hindi">Hindi</option>
+    <option value="Tamil">Tamil</option>
+</select>
+          </div>
+          <div class="control-group">
+            <label>Model</label>
+            <select class="nav-select" id="modelSelect">
+  <option value="phi3" selected>phi3 (Fast)</option>
+  <option value="llama3:latest">llama3</option>
+  <option value="gemma:2b">gemma 2B</option>
+</select>
+          </div>
+          <button class="btn save-btn" id="saveBtn">💾 Save</button>
+          <button class="btn load-btn" id="loadBtn">📂 Load</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-layout">
+      <aside class="sidebar">
+        <div class="panel glass">
+          <h3>Story Controls</h3>
+          
+          <div class="control">
+            <label>Genre</label>
+            <select>
+              <option>Romantic</option>
+              <option>Horror</option>
+              <option>Suspense</option>
+              <option>Thriller</option>
+              <option>Fantasy</option>
+              <option>Sci-Fi</option>
+              <option>Mystery</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label>Writing Mode</label>
+            <select>
+              <option>Beginning</option>
+              <option>Middle</option>
+              <option>Climax</option>
+              <option>Ending</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label>Tone</label>
+            <select>
+              <option>Dramatic</option>
+              <option>Creative</option>
+              <option>Emotional</option>
+              <option>Humorous</option>
+              <option>Dark</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label>Creativity Level: <span class="slider-value">75</span>%</label>
+            <input type="range" min="0" max="100" value="75" class="slider">
+          </div>
+
+          <div class="control">
+            <label>Response Length</label>
+            <select>
+              <option>Short</option>
+              <option>Medium</option>
+              <option>Long</option>
+            </select>
+          </div>
+
+          <button class="btn continue-btn">▶ Continue</button>
+        </div>
+      </aside>
+
+      <!-- Center Editor -->
+      <div class="editor-container">
+        <div class="editor-panel glass">
+          <textarea class="editor" placeholder="Once upon a time..."></textarea>
+          <div class="editor-glow"></div>
+        </div>
+      </div>
+
+      <!-- Right Assistant Panel -->
+      <aside class="assistant-panel">
+        <div class="panel glass">
+          <h3>AI Assistant</h3>
+          
+          <div class="button-group">
+            <button class="btn action-btn primary">✨ Generate</button>
+            <button class="btn action-btn secondary">⏭ Continue</button>
+            <button class="btn action-btn secondary">✏️ Edit Selection</button>
+          </div>
+
+          <div class="suggestion-area" id="suggestionArea">
+            <div class="empty-state">
+              <div class="beam-icon">🔮</div>
+              <p>Write a story idea or select text to begin</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Save/Load Modal -->
+    <div class="modal" id="loadModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📂 Saved Stories</h2>
+          <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+        <div class="saved-stories" id="savedStories">
+          <p style="color: var(--text-secondary); text-align: center; padding: 20px;">No saved stories yet. Start writing!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+/* =========================
+   🔒 ADVANCED GUARDRAILS
+========================= */
+function isUnsafe(text) {
+  const lower = text.toLowerCase();
+
+  const patterns = [
+
+    // Hate Speech & Racism
+    /why .* (religion|race|community) .* evil/,
+    /i hate (muslims|hindus|christians|jews|blacks|whites)/,
+    /kill all .*/,
+    /all .* should die/,
+    /racial slur/,
+    /nazi|kkk|white supremacist/,
+
+    // Political Manipulation / Fake News
+    /create fake news/,
+    /influence voters/,
+    /manipulate election/,
+    /overthrow government/,
+    /propaganda campaign/,
+    /assassinate (president|leader|minister)/,
+
+    // Illegal Activities
+    /how to hack/,
+    /hack instagram/,
+    /bank fraud/,
+    /identity theft/,
+    /make drugs/,
+    /manufacture meth/,
+    /credit card scam/,
+    /piracy|illegal download/,
+
+    // Dangerous Advice / Self Harm
+    /best way to overdose/,
+    /how to kill myself/,
+    /suicide method/,
+    /end my life/,
+    /mix bleach and/,
+    /cut wrists/,
+    /poison yourself/,
+
+    // Explicit / Sexual Content
+    /pornographic/,
+    /explicit sex/,
+    /sexual act in detail/,
+    /adult content involving minors/,
+    /nsfw/,
+    /child abuse/,
+
+    // Graphic Violence
+    /graphic murder/,
+    /blood splattered everywhere/,
+    /detailed torture/,
+    /beheading/,
+    /massacre/,
+    /terror attack/,
+
+    // Terrorism / Bombs / Weapons
+    /bomb making/,
+    /terror attack/,
+    /join terrorist/,
+    /make explosives/,
+    /weapon tutorial/,
+
+    // Sensitive Personal Info
+    /share passwords/,
+    /personal info of/,
+    /doxxing/,
+    /social security number/,
+    /credit card number/
+  ];
+
+  if (patterns.some(pattern => pattern.test(lower))) return true;
+
+  // Extra safety: block extremely long or repetitive prompts
+  if (text.length > 5000 || /(.)\1{30,}/.test(text)) return true;
+
+  return false;
+}
+
+/* =========================
+   ⚡ STREAMING OLLAMA
+========================= */
+async function callOllamaStream(prompt, onChunk) {
+  try {
+    const model = document.getElementById('modelSelect').value;
+
+    const res = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: prompt,
+        stream: true
+      })
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split("\n").filter(l => l.trim());
+
+      for (let line of lines) {
+        let parsed;
+        try { parsed = JSON.parse(line); } catch { continue; }
+
+        if (parsed.response) {
+          if (!isUnsafe(parsed.response)) {
+            onChunk(parsed.response);
+          } else {
+            console.warn("Blocked unsafe AI output:", parsed.response);
+            showSuggestion("⚠ AI output blocked for safety.");
+          }
+        }
+      }
+    }
+
+  } catch (err) {
+    console.error("Streaming failed:", err);
+    showSuggestion("⚠ Streaming error.");
+  }
+}
+
+/* =========================
+   UI HELPERS
+========================= */
+const slider = document.querySelector('.slider');
+const sliderValue = document.querySelector('.slider-value');
+const editor = document.querySelector('.editor');
+const suggestionArea = document.getElementById('suggestionArea');
+
+function showLoading() {
+  suggestionArea.innerHTML =
+    '<p style="color: var(--text-secondary); font-size: 13px;">AI is thinking...</p>';
+}
+
+function showSuggestion(text) {
+  suggestionArea.innerHTML =
+    `<div><p>${text}</p>
+     <button class="btn secondary use-suggestion">Use This</button></div>`;
+
+  document.querySelector('.use-suggestion').addEventListener('click', () => {
+    editor.value += "\n\n" + text;
+    editor.focus();
+  });
+}
+
+/* =========================
+   GENERATE STORY
+========================= */
+async function generateStory() {
+  const controls = document.querySelectorAll('.sidebar .control select');
+  const genre = controls[0].value;
+  const mode = controls[1].value;
+  const tone = controls[2].value;
+  const length = controls[3].value;
+  const creativity = slider.value;
+
+  let prompt = `Write a ${genre} story starting at the ${mode}.
+Tone: ${tone}.
+Length: ${length}.
+Creativity: ${creativity}%.`;
+
+  if (editor.value.trim()) {
+    prompt = `Continue this ${genre} story in a ${tone} tone:\n\n${editor.value}`;
+  }
+
+  if (isUnsafe(prompt)) {
+    showSuggestion("⚠ Content blocked by safety guardrails.");
+    return;
+  }
+
+  editor.focus();
+  showLoading();
+  editor.value += "\n\n";
+
+  await callOllamaStream(prompt, (chunk) => {
+    editor.value += chunk;
+    editor.scrollTop = editor.scrollHeight;
+  });
+
+  showSuggestion("✨ Generation complete.");
+}
+
+/* =========================
+   CONTINUE STORY
+========================= */
+async function continueStory() {
+  if (!editor.value.trim()) {
+    generateStory();
+    return;
+  }
+
+  const tone = document.querySelectorAll('.sidebar .control select')[2].value;
+  const prompt = `Continue this story in a ${tone} tone:\n\n${editor.value}`;
+
+  if (isUnsafe(prompt)) {
+    showSuggestion("⚠ Content blocked by safety guardrails.");
+    return;
+  }
+
+  editor.value += "\n\n";
+
+  await callOllamaStream(prompt, (chunk) => {
+    if (!isUnsafe(chunk)) {
+      editor.value += chunk;
+      editor.scrollTop = editor.scrollHeight;
+    } else {
+      console.warn("Blocked unsafe AI output:", chunk);
+      showSuggestion("⚠ AI output blocked for safety.");
+    }
+  });
+
+  showSuggestion("⏭ Continued.");
+}
+
+/* =========================
+   EDIT SELECTION
+========================= */
+async function editSelection() {
+  const selected = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+  if (!selected) {
+    showSuggestion("Select text to edit.");
+    return;
+  }
+
+  const tone = document.querySelectorAll('.sidebar .control select')[2].value;
+  const prompt = `Rewrite this text in a ${tone} tone:\n\n${selected}`;
+
+  if (isUnsafe(prompt)) {
+    showSuggestion("⚠ Blocked by safety guardrails.");
+    return;
+  }
+
+  showLoading();
+  let newText = "";
+
+  await callOllamaStream(prompt, (chunk) => {
+    if (!isUnsafe(chunk)) {
+      newText += chunk;
+    } else {
+      console.warn("Blocked unsafe AI output during edit:", chunk);
+    }
+  });
+
+  if (newText) {
+    editor.setRangeText(newText);
+    showSuggestion("✏ Edited successfully.");
+  } else {
+    showSuggestion("⚠ AI output blocked for safety.");
+  }
+}
+
+/* =========================
+   SAVE / LOAD
+========================= */
+const saveBtn = document.getElementById('saveBtn');
+const loadBtn = document.getElementById('loadBtn');
+const loadModal = document.getElementById('loadModal');
+const closeModal = document.getElementById('closeModal');
+const savedStoriesContainer = document.getElementById('savedStories');
+
+function saveStory() {
+  const title = prompt("Enter story title:");
+  if (!title) return;
+
+  if (isUnsafe(editor.value)) {
+    alert("⚠ Story contains unsafe content. Cannot save.");
+    return;
+  }
+
+  const stories = JSON.parse(localStorage.getItem("stories") || "{}");
+  stories[title] = editor.value;
+  localStorage.setItem("stories", JSON.stringify(stories));
+
+  alert("Saved!");
+}
+
+function openLoadModal() {
+  loadModal.style.display = "flex";
+  const stories = JSON.parse(localStorage.getItem("stories") || "{}");
+  savedStoriesContainer.innerHTML = "";
+
+  if (Object.keys(stories).length === 0) {
+    savedStoriesContainer.innerHTML =
+      '<p style="text-align:center;color:gray;">No saved stories.</p>';
+    return;
+  }
+
+  for (let title in stories) {
+    const div = document.createElement("div");
+    div.style.padding = "10px";
+    div.style.cursor = "pointer";
+    div.innerHTML = "📖 " + title;
+    div.onclick = () => {
+      editor.value = stories[title];
+      loadModal.style.display = "none";
+    };
+    savedStoriesContainer.appendChild(div);
+  }
+}
+
+/* =========================
+   EVENTS
+========================= */
+slider.addEventListener('input', e => sliderValue.textContent = e.target.value);
+document.querySelector('.action-btn.primary').addEventListener('click', generateStory);
+document.querySelectorAll('.action-btn.secondary')[0].addEventListener('click', continueStory);
+document.querySelectorAll('.action-btn.secondary')[1].addEventListener('click', editSelection);
+saveBtn.addEventListener('click', saveStory);
+loadBtn.addEventListener('click', openLoadModal);
+closeModal.addEventListener('click', () => loadModal.style.display = "none");
+
+/* =========================
+   CHECK OLLAMA SERVER
+========================= */
+async function checkOllama() {
+  try {
+    const res = await fetch('http://localhost:11434/api/tags');
+    if (!res.ok) throw new Error();
+    document.getElementById('ollamaNotice').style.display = 'none';
+  } catch {
+    document.getElementById('ollamaNotice').style.display = 'block';
+  }
+}
+checkOllama();
+</script>
+</body>
+</html> 
