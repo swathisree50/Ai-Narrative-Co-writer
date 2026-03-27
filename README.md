@@ -71,19 +71,19 @@ The system introduces a structured storytelling framework that:
 ### Main Interface
 
 <p align="center">
-  <img src="screenshots/main.png" width="90%">
+  <img src="./screenshots/main.png" width="60%">
 </p>
 
 ### Story Controls Panel
 
 <p align="center">
-  <img src="screenshots/controls.png" width="60%">
+  <img src="./screenshots/controls.png" width="60%">
 </p>
 
 ### AI Assistant Panel
 
 <p align="center">
-  <img src="screenshots/assistant.png" width="60%">
+  <img src="./screenshots/assistant.png" width="60%">
 </p>
 
 ---
@@ -258,12 +258,3 @@ ollama serve
 
 AI Narrative Co-Writer transforms conventional text generation into structured storytelling by integrating prompt engineering, context retention, and user-guided controls. The system demonstrates a practical and scalable approach to AI-assisted creative writing.
 
----
-
-
-
----
-
-## License
-
-MIT License
