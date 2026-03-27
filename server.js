@@ -141,7 +141,8 @@ res.json({ status: "running" });
 } catch {
 
 ```
-res.json({ status: "offline" });
+res.json({ status: "offline",
+ message: "AI features require local setup. Please run Ollama locally." });
 ```
 
 }
