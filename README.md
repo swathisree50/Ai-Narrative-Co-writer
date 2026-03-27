@@ -1,7 +1,7 @@
 # AI Narrative Co-Writer (StorySculpt)
 
 
-Developed as part of the Infosys Springboard Virtual Internship (Batch 13)
+Developed by Swathisree  as part of the Infosys Springboard Virtual Internship (Batch 13)
 Team C
 
 ---
@@ -186,6 +186,29 @@ The system uses structured prompts to:
 
 ---
 
+Installation
+Prerequisites
+Node.js (v14 or above)
+npm (Node Package Manager)
+Ollama installed and running
+
+---
+
+Steps to Run
+
+1.Clone the repository:
+git clone https://github.com/swathisree50/Ai-Narrative-Co-writer.git
+cd Ai-Narrative-Co-writer
+2.Install dependencies:
+npm install
+3.Start backend server:
+node server.js
+4.Start AI engine:
+ollama serve
+5.Open application:
+Open index.html in browser
+
+---
 ## Use Cases
 
 * Creative writing assistance
