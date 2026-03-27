@@ -75,12 +75,12 @@ The system introduces a structured storytelling framework that:
 
 ### Story Controls Panel
 <p align="center">
-  <img src="./screenshots/controls.png" width="20%">
+  <img src="./screenshots/controls.png" width="25%">
 </p>
 
 ### AI Assistant Panel
 <p align="center">
-  <img src="./screenshots/assistant.png" width="20%">
+  <img src="./screenshots/assistant.png" width="25%">
 </p>
 
 ---
