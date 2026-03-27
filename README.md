@@ -7,10 +7,10 @@ Team C
 ---
 ## Team
 
-Aamir
-Swathi
-Ashima
-Nivethitha
+Aamir,
+Swathi,
+Ashima,
+Nivethitha,
 Rajeswari
 
 ---
