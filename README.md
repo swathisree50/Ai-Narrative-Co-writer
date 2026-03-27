@@ -70,19 +70,18 @@ The system introduces a structured storytelling framework that:
 
 ### Main Interface
 <p align="center">
-  <img src="./screenshots/main.png" width="90%">
+  <img src="./screenshots/main.png" width="70%">
 </p>
 
 ### Story Controls Panel
 <p align="center">
-  <img src="./screenshots/controls.png" width="40%">
+  <img src="./screenshots/controls.png" width="30%">
 </p>
 
 ### AI Assistant Panel
 <p align="center">
-  <img src="./screenshots/assistant.png" width="40%">
+  <img src="./screenshots/assistant.png" width="30%">
 </p>
-
 ---
 
 ## System Architecture
