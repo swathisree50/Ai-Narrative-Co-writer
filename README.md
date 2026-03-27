@@ -196,6 +196,17 @@ The system uses structured prompts to:
 
 ---
 
+## Note
+
+AI features require a local setup.  
+Please ensure that Ollama is running before using AI functionality:
+
+ollama serve
+
+The deployed version demonstrates the user interface only, while full AI features are available in the local environment.
+
+---
+
 ### Steps to Run
 
 1. Clone the repository:  
